@@ -1,0 +1,9 @@
+*.suo
+packages/*
+Plotter.Tests.WinForms/bin
+Plotter.Tests.WinForms/obj
+Plotter.Tests/bin
+Plotter.Tests/obj
+Plotter/bin
+Plotter/obj
+*.user
