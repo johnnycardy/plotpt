@@ -59,7 +59,7 @@ namespace Plotter.Tweet.Processing.Commands
             {
                 //Render the chart and return with the message
                 var rendering = new Rendering(chart, allPoints.ToArray());
-                chartImage = rendering.Render();
+                chartImage = rendering.RenderPng();
             }
 
             return new Tuple<byte[], string>(chartImage, message);

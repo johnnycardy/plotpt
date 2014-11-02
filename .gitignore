@@ -7,3 +7,4 @@ Plotter.Tests/obj
 Plotter/bin
 Plotter/obj
 *.user
+Plotter/Web.config

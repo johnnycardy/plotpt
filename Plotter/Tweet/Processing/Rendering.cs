@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Windows.Forms.DataVisualization;
@@ -19,7 +20,7 @@ namespace Plotter.Tweet.Processing
 			_points = points;
 		}
 
-		public byte[] Render()
+		public byte[] RenderPng()
 		{
             var chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             chart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(223)))), ((int)(((byte)(193)))));
@@ -28,7 +29,7 @@ namespace Plotter.Tweet.Processing
             chart.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chart.BorderlineWidth = 2;
             chart.BorderSkin.SkinStyle = System.Windows.Forms.DataVisualization.Charting.BorderSkinStyle.Emboss;
-
+            
             //chart.PostPaint += chart_PostPaint;
             var series = new Series(string.IsNullOrEmpty(_chart.Title) ? "Series" : _chart.Title);
             series.ChartType = SeriesChartType.Line;
@@ -49,7 +50,7 @@ namespace Plotter.Tweet.Processing
             chartArea1.Area3DStyle.Rotation = 10;
             chartArea1.Area3DStyle.WallWidth = 0;
             chartArea1.AxisX.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea1.AxisX.IsLabelAutoFit = false;
+            chartArea1.AxisX.IsLabelAutoFit = true;
             chartArea1.AxisX.LabelStyle.Font = new System.Drawing.Font("Trebuchet MS", 8.25F, System.Drawing.FontStyle.Bold);
             chartArea1.AxisX.LabelStyle.Interval = 0;
             chartArea1.AxisX.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
@@ -58,7 +59,6 @@ namespace Plotter.Tweet.Processing
             chartArea1.AxisY.IsLabelAutoFit = false;
             chartArea1.AxisY.IsStartedFromZero = false;
             chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Trebuchet MS", 8.25F, System.Drawing.FontStyle.Bold);
-            chartArea1.AxisY.LabelStyle.Format = "N0";
             chartArea1.AxisY.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             chartArea1.BackColor = System.Drawing.Color.OldLace;
@@ -77,13 +77,15 @@ namespace Plotter.Tweet.Processing
             {
                 chart.Legends.Add(new Legend()
                 {
-                    Title = _chart.Title
+                    Docking = Docking.Top
                 });
             }
 
-            chart.SaveImage(@"c:\Users\Jonathan\documents\img.png", ChartImageFormat.Png);
-
-            return new byte[0];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                chart.SaveImage(ms, ChartImageFormat.Png);
+                return ms.ToArray();
+            }
 		}
 
 
@@ -115,27 +117,96 @@ namespace Plotter.Tweet.Processing
 
         private string GetDateTimeAxisFormat(DateTime min, DateTime max)
         {
-            TimeSpan spanne = max - min;
-            TimeSpan milliseconds = new TimeSpan(0, 0, 5); //5ms
-            TimeSpan seconds = new TimeSpan(0, 5, 0); //5min
-            TimeSpan minutes = new TimeSpan(23, 0, 0); //23hrs
+            var interval = GetSuitableIntervalFromTimespan(max - min);
 
-            if (spanne < milliseconds)
+            switch(interval)
             {
-                return "HH:mm:ss.fff";
+                case TimeInterval.Milliseconds:
+                    return "HH:mm:ss.fff";
+                case TimeInterval.Seconds:
+                    return "HH:mm:ss";
+                case TimeInterval.Minutes:
+                    return "HH:mm";
+                case TimeInterval.Hours:
+                    return "HH:mm";
+                case TimeInterval.Days:
+                    return "MMM dd";
+                case TimeInterval.Weeks:
+                    return "MMM dd";
+                case TimeInterval.Months:
+                    return "MMM yyyy";
+                case TimeInterval.Quarters:
+                    return "MMM yyyy";
+                case TimeInterval.Years:
+                case TimeInterval.Decades:
+                case TimeInterval.Centuries:
+                    return "yyyy";
+                default:
+                    return "HH:mm";
             }
-            else if (spanne < seconds)
+        }
+
+        private TimeInterval GetSuitableIntervalFromTimespan(TimeSpan timeSpan)
+        {
+            if(timeSpan < TimeSpan.FromSeconds(2.5))
             {
-                return "HH:mm:ss";
+                return TimeInterval.Milliseconds;
+            } 
+            else if (timeSpan < TimeSpan.FromMinutes(5))
+            {
+                return TimeInterval.Seconds;
             }
-            else if (spanne < minutes)
+            else if (timeSpan < TimeSpan.FromHours(4))
             {
-                return "HH:mm";
+                return TimeInterval.Minutes;
+            }
+            else if (timeSpan < TimeSpan.FromHours(23))
+            {
+                return TimeInterval.Hours;
+            }
+            else if (timeSpan < TimeSpan.FromDays(15))
+            {
+                return TimeInterval.Days;
+            }
+            else if(timeSpan < TimeSpan.FromDays(45))
+            {
+                return TimeInterval.Weeks;
+            }
+            else if(timeSpan < TimeSpan.FromDays(200))
+            {
+                return TimeInterval.Months;
+            }
+            else if(timeSpan < TimeSpan.FromDays(500))
+            {
+                return TimeInterval.Quarters;
+            }
+            else if(timeSpan < TimeSpan.FromDays(365 * 10))
+            {
+                return TimeInterval.Years;
+            }
+            else if(timeSpan < TimeSpan.FromDays(365 * 100))
+            {
+                return TimeInterval.Decades;
             }
             else
             {
-                return "dd:MM:yyyy HH";
+                return TimeInterval.Centuries;
             }
+        }
+
+        private enum TimeInterval
+        {
+            Milliseconds,
+            Seconds,
+            Minutes,
+            Hours,
+            Days,
+            Weeks,
+            Months,
+            Quarters,
+            Years,
+            Decades,
+            Centuries
         }
 	}
 }
