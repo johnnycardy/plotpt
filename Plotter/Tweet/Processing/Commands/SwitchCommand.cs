@@ -20,7 +20,7 @@ namespace Plotter.Tweet.Processing.Commands
 				}
 			}
 
-			string chartName = commandParams[0];
+			string chartName = commandParams.Length > 0 ? commandParams[0] : "";
 
 			//If chart is null, then they're adding their first chart
 			if(chart == null)
@@ -77,7 +77,14 @@ namespace Plotter.Tweet.Processing.Commands
                         });
                         DBContext.SaveChanges();
 
-                        return RenderResult(NewNamedChartCreatedAndHowToViewPrevious(chartName, chart.Title));
+                        if (string.IsNullOrEmpty(chartName))
+                        {
+                            return RenderResult(NewUnnamedChartCreatedAndHowToViewPrevious(chart.Title));
+                        }
+                        else
+                        {
+                            return RenderResult(NewNamedChartCreatedAndHowToViewPrevious(chartName, chart.Title));
+                        }
 	                }
 				}
 			}
@@ -103,6 +110,11 @@ namespace Plotter.Tweet.Processing.Commands
         {
             return string.Format("Chart '{0}' created. To switch back to your previous chart reply 'switch {1}'", newName, previousName);
 		}
+
+        public static string NewUnnamedChartCreatedAndHowToViewPrevious(string previousName)
+        {
+            return string.Format("New unnamed chart created. To switch back to your previous chart reply 'switch {0}'", previousName);
+        }
 
 		public static string SwitchedToPreExisting(string p)
 		{

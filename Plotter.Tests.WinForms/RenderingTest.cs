@@ -13,9 +13,9 @@ using System.Windows.Forms;
 
 namespace Plotter.Tests.WinForms
 {
-    public partial class Form1 : Form
+    public partial class RenderingTest : Form
     {
-        public Form1()
+        public RenderingTest()
         {
             InitializeComponent();
             Redraw();
@@ -70,6 +70,11 @@ namespace Plotter.Tests.WinForms
             Redraw();
 
             label6.Text = TimeSpan.FromMilliseconds(_maxMilliseconds).ToString("g");
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            new IOTest().Show(this);
         }
     }
 }

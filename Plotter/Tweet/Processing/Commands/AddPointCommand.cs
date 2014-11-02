@@ -8,11 +8,13 @@ namespace Plotter.Tweet.Processing.Commands
 {
     public class AddPointCommand : CommandBase
     {
-        public static readonly string VeryFirstPoint_ChartCreated = "Chart created! Send some more data to get a chart image back.";
+        public static readonly string VeryFirstPoint_ChartCreated = "Chart created! Send some more numbers to get a chart image back.";
 
-        public static readonly string FirstPoint_ExistingChart = "Send some more data to get a chart image back.";
+        public static readonly string FirstPoint_ExistingChart = "Send some more numbers to get a chart image back.";
 
-        public static readonly string SecondPoint_ExistingChart = "Keep sending data! To start a new chart at any time, reply 'switch'";
+        public static readonly string SecondPoint_ExistingChart_Titled = "Keep sending numbers! To start a new chart at any time, reply 'switch'. Reply 'title' to give this chart a name.";
+
+        public static readonly string SecondPoint_ExistingChart_Untitled = "Keep sending numbers! To start a new chart at any time, reply 'switch'. Reply 'title' to give this chart a name.";
 
         private decimal d;
 
@@ -55,9 +57,16 @@ namespace Plotter.Tweet.Processing.Commands
                 {
                     return RenderResult(FirstPoint_ExistingChart);
                 }
-                else
+                else if(allPoints.Count() == 2)
                 {
-
+                    if (string.IsNullOrEmpty(chart.Title))
+                    {
+                        return RenderResult(SecondPoint_ExistingChart_Untitled, chart, allPoints);
+                    }
+                    else
+                    {
+                        return RenderResult(SecondPoint_ExistingChart_Titled, chart, allPoints);
+                    }
                 }
             }
 

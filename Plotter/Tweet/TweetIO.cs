@@ -14,21 +14,17 @@ namespace Plotter.Tweet
 {
     public class TweetIO
     {
-        
         public TweetIO()
         {
-            
             string userAccessToken = System.Configuration.ConfigurationManager.AppSettings["userAccessToken"];
             string userAccessSecret = System.Configuration.ConfigurationManager.AppSettings["userAccessSecret"];
             string consumerKey = System.Configuration.ConfigurationManager.AppSettings["consumerKey"];
             string consumerSecret = System.Configuration.ConfigurationManager.AppSettings["consumerSecret"];
             
             TwitterCredentials.SetCredentials(userAccessToken, userAccessSecret, consumerKey, consumerSecret);
-
-            PlotterDBContext dbContext = new PlotterDBContext();
-
+            
             ConcurrentQueue<Tweet> incomingQueue = new ConcurrentQueue<Tweet>();
-            QueueProcessor processor = new QueueProcessor(incomingQueue, dbContext);
+            QueueProcessor processor = new QueueProcessor(incomingQueue, new PlotterDBContext());
 
             StartHandleOutgoing(processor);
             StartHandleIncoming(incomingQueue);
@@ -36,20 +32,6 @@ namespace Plotter.Tweet
 
         private void StartHandleIncoming(ConcurrentQueue<Tweet> queue)
         {
-            /*
-            var thread = new Thread(() =>
-            {
-                var fs = Stream.CreateFilteredStream();
-                fs.AddTrack("@plotpt");
-                fs.AddTrack("plotpt");
-                fs.MatchingTweetReceived += (sender, args) =>
-                {
-
-                };
-                fs.StartStreamMatchingAnyCondition();
-            });
-            thread.Start();
-            */
             var us = Stream.CreateUserStream();
             us.TweetCreatedByAnyone += (sender, args) =>
             {
@@ -61,7 +43,6 @@ namespace Plotter.Tweet
             };
             var thread2 = new Thread(() => us.StartStream());
             thread2.Start();
-             
         }
 
         private void StartHandleOutgoing(QueueProcessor queueProcessor)
