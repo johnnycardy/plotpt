@@ -94,7 +94,7 @@ namespace Plotter.Tweet.Processing.Commands
 
 		public static string JustSendSomeDangData { get { return "Tweet me a number to add it to a chart!"; } }
 
-        public static string CurrentChartNeedsAName { get { return "Before you can switch charts, give your current chart a title. Reply 'title <title>'"; } }
+        public static string CurrentChartNeedsAName { get { return "Before you can switch charts, give your current chart a title. Reply 'title newtitle'"; } }
 
 		public static string NewNamedChartCreated(string p)
 		{

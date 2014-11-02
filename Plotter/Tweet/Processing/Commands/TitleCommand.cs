@@ -47,7 +47,7 @@ namespace Plotter.Tweet.Processing.Commands
 
         public static string InvalidCommandMessage
         {
-            get { return "No new title supplied! Reply 'title <newtitle>' to set a title."; }
+            get { return "No new title supplied! Reply 'title newtitle' to set a title."; }
         }
 
         public static string NewChartTitleSet(string title)
