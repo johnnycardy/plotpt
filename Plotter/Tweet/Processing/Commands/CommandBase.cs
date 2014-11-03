@@ -49,13 +49,13 @@ namespace Plotter.Tweet.Processing.Commands
             if (chart == null)
                 chart = GetActiveChart();
 
-            if (allPoints == null)
+            if (allPoints == null && chart != null)
                 allPoints = GetPoints(chart);
 
             byte[] chartImage = null;
 
             //Only render the chart if there's a few points.
-            if (allPoints.Count() > 1)
+            if (allPoints != null && allPoints.Count() > 1)
             {
                 //Render the chart and return with the message
                 var rendering = new Rendering(chart, allPoints.ToArray());

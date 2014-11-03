@@ -12,9 +12,9 @@ namespace Plotter.Tweet.Processing.Commands
 
         public static readonly string FirstPoint_ExistingChart = "Send some more numbers to get a chart image back.";
 
-        public static readonly string SecondPoint_ExistingChart_Titled = "Keep sending numbers! To start a new chart at any time, reply 'switch'. Reply 'title' to give this chart a name.";
+        public static readonly string SecondPoint_ExistingChart_Titled = "Keep sending numbers! To start a new chart, reply 'switch'. Reply 'title' to set a title.";
 
-        public static readonly string SecondPoint_ExistingChart_Untitled = "Keep sending numbers! To start a new chart at any time, reply 'switch'. Reply 'title' to give this chart a name.";
+        public static readonly string SecondPoint_ExistingChart_Untitled = "Keep sending numbers! To start a new chart, reply 'switch'. Reply 'title' to set a title.";
 
         private decimal d;
 

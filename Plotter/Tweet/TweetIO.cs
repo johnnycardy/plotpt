@@ -14,7 +14,28 @@ namespace Plotter.Tweet
 {
     public class TweetIO
     {
-        public TweetIO()
+        private static object _lockObj = new object();
+        private static TweetIO _instance = null;
+
+        public static TweetIO Instance
+        {
+            get
+            {
+                if(_instance == null)
+                {
+                    lock(_lockObj)
+                    {
+                        if(_instance == null)
+                        {
+                            _instance = new TweetIO();
+                        }
+                    }
+                }
+                return _instance;
+            }
+        }
+
+        private TweetIO()
         {
             string userAccessToken = System.Configuration.ConfigurationManager.AppSettings["userAccessToken"];
             string userAccessSecret = System.Configuration.ConfigurationManager.AppSettings["userAccessSecret"];
@@ -49,8 +70,25 @@ namespace Plotter.Tweet
         {
             queueProcessor.TweetReady += (object sender, Tweet e) =>
             {
-                ITweet tweet = Tweetinvi.Tweet.CreateTweet(e.GetMessageForSending());
-                tweet.Publish();
+                ITweet tweet = null;
+                
+                if(e.Image != null && e.Image.Length > 0)
+                {
+                    tweet = Tweetinvi.Tweet.CreateTweetWithMedia(e.GetMessageForSending(), e.Image);
+                }
+                else
+                {
+                    tweet = Tweetinvi.Tweet.CreateTweet(e.GetMessageForSending());
+                }
+
+                try
+                {
+                    bool success = tweet.Publish();
+                }
+                catch(Exception ex)
+                {
+
+                }
             };
         }
     }
