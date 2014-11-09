@@ -12,8 +12,16 @@ namespace Plotter.Controllers
         // GET: WakeUp
         public ActionResult Index()
         {
-            //Wait it up by making sure instance is initialised
-            return View(TweetIO.Instance);
+            bool isAwake = TweetIO.IsAwake;
+            if (isAwake)
+            {
+                return Content("Already awake");
+            }
+            else
+            {
+                TweetIO.WakeUp();
+                return Content("Woken up");
+            }
         }
     }
 }

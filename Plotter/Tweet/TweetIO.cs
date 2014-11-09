@@ -17,21 +17,25 @@ namespace Plotter.Tweet
         private static object _lockObj = new object();
         private static TweetIO _instance = null;
 
-        public static TweetIO Instance
+        public static bool IsAwake
         {
             get
             {
-                if(_instance == null)
+                return _instance != null;
+            }
+        }
+
+        public static void WakeUp()
+        {
+            if(_instance == null)
+            {
+                lock(_lockObj)
                 {
-                    lock(_lockObj)
+                    if(_instance == null)
                     {
-                        if(_instance == null)
-                        {
-                            _instance = new TweetIO();
-                        }
+                        _instance = new TweetIO();
                     }
                 }
-                return _instance;
             }
         }
 
